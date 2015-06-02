@@ -1,6 +1,7 @@
 package com.pdroid84.blob.services;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -21,6 +22,21 @@ public class ServeImage extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
+    	
+    	System.out.println("The doGet method is called");
+    	
+    	//Get all the header names and associated values
+    	Enumeration<String> headerNames = req.getHeaderNames();
+    	while (headerNames.hasMoreElements()) {
+    		String headerName = headerNames.nextElement();
+    		System.out.println("Header Name = " + headerName);
+    		Enumeration<String> headers = req.getHeaders(headerName);
+    		while (headers.hasMoreElements()) {
+    			String headerValue = headers.nextElement();
+    			System.out.println("Header Values = " +headerValue);
+    		}
+    	}
+    	
         String title = req.getParameter("title");
         System.out.println("The value req.getParameter(title):" +req.getParameter("title").toString());
         Movie movie = getMovie(title);

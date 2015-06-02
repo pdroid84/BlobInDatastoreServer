@@ -10,7 +10,7 @@
 <body>
     <center>
         <h1>File Upload to Database Demo</h1>
-        <form method="post" action="upload" enctype="multipart/form-data">
+        <form method="post" action="/upload" enctype="multipart/form-data">
             <table border="0">
                 <tr>
                     <td>Image Title: </td>
