@@ -27,6 +27,47 @@
   "ownerName" : "pdroid84.com",
   "packagePath" : "blob.dao",
   "methods" : {
+    "movieendpoint.listMovie" : {
+      "path" : "movie",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.pdroid84.blob.dao.MovieEndpoint.listMovie",
+      "request" : {
+        "parameters" : {
+          "cursor" : {
+            "type" : "string",
+            "required" : false
+          },
+          "limit" : {
+            "type" : "int32",
+            "required" : false
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "movieendpoint.insertMovie" : {
+      "path" : "movie",
+      "httpMethod" : "POST",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.pdroid84.blob.dao.MovieEndpoint.insertMovie",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
     "movieendpoint.updateMovie" : {
       "path" : "movie",
       "httpMethod" : "PUT",
@@ -84,51 +125,25 @@
       "response" : {
         "body" : "autoTemplate(backendResponse)"
       }
-    },
-    "movieendpoint.listMovie" : {
-      "path" : "movie",
-      "httpMethod" : "GET",
-      "authLevel" : "NONE",
-      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
-      "audiences" : [ ],
-      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
-      "rosyMethod" : "com.pdroid84.blob.dao.MovieEndpoint.listMovie",
-      "request" : {
-        "parameters" : {
-          "cursor" : {
-            "type" : "string",
-            "required" : false
-          },
-          "limit" : {
-            "type" : "int32",
-            "required" : false
-          }
-        },
-        "body" : "empty"
-      },
-      "response" : {
-        "body" : "autoTemplate(backendResponse)"
-      }
-    },
-    "movieendpoint.insertMovie" : {
-      "path" : "movie",
-      "httpMethod" : "POST",
-      "authLevel" : "NONE",
-      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
-      "audiences" : [ ],
-      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
-      "rosyMethod" : "com.pdroid84.blob.dao.MovieEndpoint.insertMovie",
-      "request" : {
-        "body" : "autoTemplate(backendRequest)",
-        "bodyName" : "resource"
-      },
-      "response" : {
-        "body" : "autoTemplate(backendResponse)"
-      }
     }
   },
   "descriptor" : {
     "schemas" : {
+      "CollectionResponse_Movie" : {
+        "id" : "CollectionResponse_Movie",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "Movie"
+            }
+          },
+          "nextPageToken" : {
+            "type" : "string"
+          }
+        }
+      },
       "Movie" : {
         "id" : "Movie",
         "type" : "object",
@@ -148,24 +163,22 @@
             "format" : "int64"
           }
         }
-      },
-      "CollectionResponse_Movie" : {
-        "id" : "CollectionResponse_Movie",
-        "type" : "object",
-        "properties" : {
-          "items" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "Movie"
-            }
-          },
-          "nextPageToken" : {
-            "type" : "string"
-          }
-        }
       }
     },
     "methods" : {
+      "com.pdroid84.blob.dao.MovieEndpoint.listMovie" : {
+        "response" : {
+          "$ref" : "CollectionResponse_Movie"
+        }
+      },
+      "com.pdroid84.blob.dao.MovieEndpoint.insertMovie" : {
+        "request" : {
+          "$ref" : "Movie"
+        },
+        "response" : {
+          "$ref" : "Movie"
+        }
+      },
       "com.pdroid84.blob.dao.MovieEndpoint.updateMovie" : {
         "request" : {
           "$ref" : "Movie"
@@ -177,19 +190,6 @@
       "com.pdroid84.blob.dao.MovieEndpoint.removeMovie" : {
       },
       "com.pdroid84.blob.dao.MovieEndpoint.getMovie" : {
-        "response" : {
-          "$ref" : "Movie"
-        }
-      },
-      "com.pdroid84.blob.dao.MovieEndpoint.listMovie" : {
-        "response" : {
-          "$ref" : "CollectionResponse_Movie"
-        }
-      },
-      "com.pdroid84.blob.dao.MovieEndpoint.insertMovie" : {
-        "request" : {
-          "$ref" : "Movie"
-        },
         "response" : {
           "$ref" : "Movie"
         }

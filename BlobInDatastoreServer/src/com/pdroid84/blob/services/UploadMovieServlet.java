@@ -47,7 +47,19 @@ public class UploadMovieServlet extends HttpServlet {
     	byte[] buffer = new byte[1024];
     	ByteArrayOutputStream mReadBuffer = new ByteArrayOutputStream();
     	FileItem item = null;
+    	long maxFileSize = 1024 * 1024;
+        int maxMemSize = 1024 * 1024;
+        List<FileItem> items = null;
+        InputStream inputStream = null; // input stream of the upload file
+    	
     	System.out.println("UploadMovieServlet POST method is called");
+    	
+    	if(ServletFileUpload.isMultipartContent(request)) {
+    		System.out.println("Request has multi-part body");
+    	} 
+    	else {
+    		System.out.println("Request has NOT multi-part body");
+    	}
     	//Get all the header names and associated values
     	Enumeration<String> headerNames = request.getHeaderNames();
     	while (headerNames.hasMoreElements()) {
@@ -70,11 +82,8 @@ public class UploadMovieServlet extends HttpServlet {
     		}
     	}
     	
-        String title = request.getParameter("title");
-        System.out.println("Image Title: " + title);
-         
-        InputStream inputStream = null; // input stream of the upload file
-         
+        //String title = request.getParameter("title");
+        //System.out.println("Image Title: " + title); 
         // obtains the upload file part in this multipart request
         // mulitpart (i.e. getPart is not working in Jetty 6.0 which is in current JAE
     /*   Part filePart = request.getPart("photo");
@@ -88,74 +97,66 @@ public class UploadMovieServlet extends HttpServlet {
             inputStream = filePart.getInputStream();
         }  */
         
-        
-        
         response.setContentType("text/plain");
-        try {
-        	// Create a factory for disk-based file items
-        	DiskFileItemFactory factory = new DiskFileItemFactory();
-
-        	// Configure a repository (to ensure a secure temp location is used)
-        	ServletContext servletContext = this.getServletConfig().getServletContext();
-        	File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
-        	factory.setRepository(repository);
-
-        	// Create a new file upload handler
-        	ServletFileUpload upload = new ServletFileUpload(factory);
-            
-         // Parse the request
-            List<FileItem> items = upload.parseRequest(request);
-			Iterator<FileItem> iter = items.iterator();
-			// Following line givning null pointer exception
-			//		System.out.println("Total number of items = " + (upload.parseRequest(request).size()));
-			int i = 0;
-			while (iter.hasNext()) {
-				System.out.println("Iterator is called " + i++);
-				item = iter.next();
-				
-				if (item.isFormField()) {
-					System.out.println("Got a form Field:" + item.getFieldName() + ", value = " + item.getString());
-				} else {
-					System.out.println("Got an uploaded file: " + item.getFieldName() + ", name : " + item.getName());
-					System.out.println("Content type =" + item.getContentType());
-					System.out.println("Item Size =" + item.getSize());
-					
-					inputStream = item.getInputStream();
-					
-					// You now have the filename (item.getName() and the
-			          // contents (which you can read from stream). Here we just
-			          // print them back out to the servlet output stream, but you
-			          // will probably want to do something more interesting (for
-			          // example, wrap them in a Blob and commit them to the
-			          // datastore).
-					
-					//  inputStream.mark(1024*1024);
-			        //  System.out.println("Total length by available function= " + inputStream.available());
-			          			          
-			   /*       int length = 0 ;
-			          InputStream iStream = item.openStream();
-			          while(iStream.read() != -1) {
-			        	  length = length + 1;
-			          } 
-			          System.out.println("Total length by using logic = " + length); */
-			          //inputStream.reset();
-			          int len;
-			          while ((len = inputStream.read(buffer, 0, buffer.length)) != -1) {
-			            response.getOutputStream().write(buffer, 0, len);
-			            mReadBuffer.write(buffer, 0, len);
-			            System.out.println("In the while inputstream loop, len = " + len);
-			          }
-			          System.out.println("After the while inputstream loop, len = " + len);
-				}
-			} 
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw new ServletException(e);
-		} 
-        finally {
-        	inputStream.close();
-        }
         
+        
+    	// Create a factory for disk-based file items
+    	DiskFileItemFactory factory = new DiskFileItemFactory();
+
+    	// Configure a repository (to ensure a secure temp location is used). This is required if seSizeThreshold is not used
+    //	ServletContext servletContext = this.getServletConfig().getServletContext();
+   // 	File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
+    	        	
+    	// Set factory constraints
+    	//use this one when repository option is not used
+    	factory.setSizeThreshold(maxMemSize);
+    	//Do not use repository if setSizeThreshold is used
+    //	factory.setRepository(repository);
+    	
+    	// Create a new file upload handler
+    	System.out.println("Going to create a new ServletFielUpload handler");
+    	ServletFileUpload upload = new ServletFileUpload(factory);
+        
+    	// maximum file size to be uploaded.
+    	//Console is throwing junks when called from android so commenting the below line
+        upload.setSizeMax(maxFileSize);
+    	
+     // Parse the request
+    	System.out.println("Going to parse the request");
+        
+		try {
+			items = upload.parseRequest(request);
+			System.out.println("The value of item size = " + items.size());
+		} catch (FileUploadException e1) {
+			// TODO Auto-generated catch block
+			System.out.println("An exception occurred while parsing the request");
+			e1.printStackTrace();
+		}
+		Iterator<FileItem> iter = items.iterator();
+		int i = 0;
+		while (iter.hasNext()) {
+			System.out.println("Iterator is called " + i++);
+			item = iter.next();
+			
+			if (item.isFormField()) {
+				System.out.println("Got a form Field:" + item.getFieldName() + ", value = " + item.getString());
+			} else {
+				System.out.println("Got an uploaded file: " + item.getFieldName() + ", name : " + item.getName());
+				System.out.println("Content type =" + item.getContentType());
+				System.out.println("Item Size =" + item.getSize());
+				
+				inputStream = item.getInputStream();
+				
+		          int len;
+		          while ((len = inputStream.read(buffer, 0, buffer.length)) != -1) {
+		            response.getOutputStream().write(buffer, 0, len);
+		            mReadBuffer.write(buffer, 0, len);
+		            System.out.println("In the while inputstream loop, len = " + len);
+		          }
+		          System.out.println("After the while inputstream loop, len = " + len);
+			}
+		}
+                
         String ImageName = item.getName().substring(0, item.getName().indexOf("."));
         System.out.println("The name without file extension = " + ImageName);
         
